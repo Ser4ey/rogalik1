@@ -9,7 +9,7 @@ keyboard.block_key('w')
 keyboard.block_key('a')
 keyboard.block_key('s')
 keyboard.block_key('d')
-#типы клеток:
+keyboard.block_key('q')#типы клеток:
 #0 - нет комнаты
 #1 - вход
 #2 - выход
@@ -79,7 +79,7 @@ class Labyrinth(object):
                         self.rooms_place[i][j] = 7
         self.rooms_place[0][0]=1
 
-        self.rooms = [[None for j in range(4)] for i in range(4)]
+        self.rooms = [[None for j in range(4)] for i in range(4)]#i - строки, jстолбцы
         for i in range(4):
             for j in range(4):
                 self.rooms[i][j] = Room(i * 4 + j + 1, self.rooms_place[i][j])
@@ -134,31 +134,6 @@ class Labyrinth(object):
                 if self.walls[i][j] == 9:
                     print("\u001b[37;1m", end="")
                     print("&", end="")
-                # if (x//15 == i//15) and (y//36 == j//36):
-                #     if self.walls[i][j] == 1:
-                #         print("\u001b[48;5;232m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
-                #     elif self.walls[i][j] == 2:
-                #         print("\u001b[48;5;232m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
-                #     elif self.walls[i][j] == 3:
-                #         print("\u001b[48;5;52m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
-                #     elif self.walls[i][j] == 4:
-                #         print("\u001b[48;5;94m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
-                #     elif self.walls[i][j] == 5:
-                #         print("\u001b[48;5;63m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
-                #     elif self.walls[i][j] == 6:
-                #         print("\u001b[48;5;28m", end="")
-                #         print(" ", end="")
-                #         print("\u001b[48;5;235m", end="")
                 elif self.walls[i][j] == 8:
                     print("\u001b[48;5;136m", end="")
                     print(" ", end="")
@@ -167,31 +142,34 @@ class Labyrinth(object):
                 else:
                     print(" ", end="")
             print()
-        print("Уровень: ", count)
-        print("_____________________________")
-        print("Комната " , "№" ,4*(x//15)+y//36+1, end="")
-        if self.rooms[x//15][y//36].typeRoom == 1:
-            print(", вход.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==2:
-            print(", выход.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==3:
-            print(", с монстром.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==4:
-            print(", с сундуком.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==5:
-            print(", с фонтаном.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==6:
-            print(", с торговцем.", end="")
-        elif self.rooms[x//15][y//36].typeRoom==7:
-            print(", коридор.", end="")
-        if self.rooms[x // 15][y // 36].check == 0:
-            print(", взаимодействия не было.")
-        else:
-            print(", взаимодействие было.")
 
-        print("_____________________________")
-        print("HP: ", )
-        print("_____________________________")
+        if(keyboard.is_pressed('q')):
+            print("Уровень: ", count)
+            print("_____________________________")
+            print("Комната " , "№" ,self.rooms[x//15][y//36].idRoom, end="")
+            if self.rooms[x//15][y//36].typeRoom == 1:
+                print(", вход.")
+            elif self.rooms[x//15][y//36].typeRoom == 2:
+                print(", выход.")
+            elif self.rooms[x//15][y//36].typeRoom == 3:
+                print(" с монстром", end="")
+            elif self.rooms[x//15][y//36].typeRoom == 4:
+                print(" с сундуком", end="")
+            elif self.rooms[x//15][y//36].typeRoom == 5:
+                print(" с фонтаном", end="")
+            elif self.rooms[x//15][y//36].typeRoom == 6:
+                print(" с торговцем", end="")
+            elif self.rooms[x//15][y//36].typeRoom == 7:
+                print(", коридор.")
+            if (2 < self.rooms[x//15][y//36].typeRoom < 7):
+                if self.rooms[x // 15][y // 36].check == 0:
+                    print(", взаимодействия не было.")
+                else:
+                    print(", взаимодействие было.")
+            print("_____________________________")
+            print("HP: ", )
+            print("_____________________________")
+            keyboard.on_release_key('a', self.rooms[x // 15][y // 36].check = 1)
 
 
 def move(level, i, j):
@@ -228,12 +206,19 @@ while not keyboard.is_pressed('esc'):
     j = 2
     level.generate()
     while not (keyboard.is_pressed('RETURN') and level.rooms_place[i // 15][j // 36] == 2):
-        time.sleep(0.01)
+        time.sleep(0.001)
         level, i, j = move(level, i, j)
         level.draw(i, j, count)
-        if (level.rooms[i//15][j//36].typeRoom==3) and (level.rooms[i//15][j//36].check==0):
+        if (level.rooms[i//15][j//36].typeRoom==3) and (level.rooms[i//15][j//36].check == 0):
             print("БОЙ НАЧАЛСЯ!")
-            input()
+            time.sleep(2)
+            level.rooms[i // 15][j // 36].check = 1
+        if (level.rooms[i//15][j//36].typeRoom==4) and (level.rooms[i//15][j//36].check==0):
+            print("Воспользуйтесь сундуком, чтобы получить предметы")
+        if (level.rooms[i//15][j//36].typeRoom==5) and (level.rooms[i//15][j//36].check==0):
+            print("Воспользуйтесь фонтаном, чтобы пополнить здоровье")
+        if (level.rooms[i//15][j//36].typeRoom==6) and (level.rooms[i//15][j//36].check==0):
+            print("Воспользуйтесь торговцем, чтобы приобрести предметы")
     count += 1
 
 
