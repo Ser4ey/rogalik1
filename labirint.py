@@ -169,7 +169,9 @@ class Labyrinth(object):
             print("_____________________________")
             print("HP: ", )
             print("_____________________________")
-            keyboard.on_release_key('a', self.rooms[x // 15][y // 36].check = 1)
+            # keyboard.on_release_key('a', self.rooms[x // 15][y // 36].check = 1)
+            self.rooms[x // 15][y // 36].check = 1
+            time.sleep(3)
 
 
 def move(level, i, j):
