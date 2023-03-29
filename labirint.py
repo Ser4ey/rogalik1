@@ -23,6 +23,8 @@ keyboard.block_key('q')#типы клеток:
 
 fountain = [['   ∴ _|▔|_'],['     \___/   ∴'], ['∴   __|_|__'], ['___|_______|___'], ['|_____________|']]
 chest = [['________'],['╚══▣═══╝'],['║______║']]
+shop = [['   ^---^'], [' ( * . * )'],[' _________'],['|  shop   |'],['|_________|']]
+
 
 class Room:
     def __init__(self, id, type):
@@ -160,6 +162,17 @@ class Labyrinth(object):
                         for k in range(len(fountain)):
                             for n in range(len(fountain[k])):
                                 print(fountain[k][n])
+                    else:
+                        print(" ", end="")
+                elif self.walls[i][j] == 6 and x // 15 == i // 15 and y // 36 == j // 36:
+                    if i % 15 == 6 and j % 36 == 15:
+                        for k in range(len(shop)):
+                            for n in range(len(shop[k])):
+                                print(shop[k][n])
+                    elif i % 15 == 5 and j % 36 == 10:
+                        for k in range(len(shop)):
+                            for n in range(len(shop[k])):
+                                print(shop[k][n])
                     else:
                         print(" ", end="")
 
