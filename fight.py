@@ -12,36 +12,37 @@ class Unit:
         self.real_attack = self.base_attack
 
         self.base_armor = 10
-        self.additional_armor = 0
+        self.real_armor = self.base_armor
 
         # self.agility = 10
 
         self.estus = 3  # TODO: ??? 인벤토리로 이동 ???
-        self.weapon = None
-        self.armor = None
+        self.current_weapon = None
+        self.current_armor = None
 
     # Конечная функция, которая наносит урон
     def get_damage(self, attack) -> None:
-        self.current_health -= attack * self.get_real_damage()
+        self.current_health -= attack * self.multiplier()
 
-    # def get_total_armor(self):
-    #     if self.armor:
-    #         return self.additional_armor + self.base_armor + self.armor.item_armor
-    #     else:
-    #         return self.additional_armor + self.base_armor
+    def get_real_attack(self):
+        if self.current_weapon:
+            return self.base_attack + self.current_weapon.item_damage
+        else:
+            return self.base_attack
 
     # Функция, которая возвращает множитель, чтобы уменьшить урон, в зависимости от количества брони
-    def get_real_damage(self):
-        # full_armor = self.get_total_armor()
-        full_armor = self.base_armor + self.additional_armor
+    def multiplier(self):
+        full_armor = self.get_total_armor()
         damage_multiplier = 1 - ((0.06 * full_armor) / (1 + 0.06 * abs(full_armor)))
         return damage_multiplier
 
-    # def get_real_attack(self):
-    #     if self.weapon:
-    #         return self.base_attack + self.weapon.item_damage
-    #     else:
-    #         return self.base_attack
+    def get_total_armor(self):
+        if self.current_armor:
+            return self.base_armor + self.current_armor.item_armor
+        else:
+            return self.base_armor
+
+
 
 class Player(Unit):
     def __init__(self) -> None:
@@ -59,12 +60,22 @@ class Player(Unit):
             self.level += 1
             self.exp_for_level = self.level * 10
 
-    # def potions_actions(self):
-    #     for potion in self.effects:
-    #         if potion.duration > 0:
-    #             self.real_attack = self.base_attack + potion.value * len(filter(lambda effect: effect.duration > 0 and effect.name == potion.name))
+    def equip_armor(self, new_armor: Armor):
+        self.current_armor = new_armor
+        self.real_armor = self.base_armor + new_armor.item_armor
 
+    def equip_weapon(self, new_weapon: Weapon):
+        self.current_weapon = new_weapon
+        self.real_attack = self.base_attack + new_weapon.item_damage
 
+    def regeneration_health(self, regeneration_value):
+        difference_in_health = self.max_health - self.current_health
+        if difference_in_health >= regeneration_value and self.estus > 0:
+            self.current_health += regeneration_value
+            self.estus -= 1
+        elif difference_in_health < regeneration_value and self.estus > 0:
+            self.current_health += difference_in_health
+            self.estus -= 1
 class Enemy(Unit):
     money_after_death = 10
     def __init__(self) -> None:
@@ -77,6 +88,7 @@ class Knight(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.exp_after_death = 20
+        self.exp_after_death = 15
         # self.agility = self.agility * 1.5
         self.armor = self.base_armor * 1.5
         self.max_health = self.max_health * 0.7
@@ -187,12 +199,15 @@ class Battle:
     def fight(player: Player, enemy: Enemy):
         turn = 1  # Порядок хода
         player_condition = True  # True = Life; False - Death
-
+        player_armor_status = False
+        enemy_armor_status = False
         while player.current_health > 0 and enemy.current_health > 0:
-            enemy.additional_armor -= 5
-            player.additional_armor -= 5
-            print(f"\nХп врага: {enemy.current_health}, общая броня врага: {enemy.additional_armor + enemy.base_armor}")
-            print(f"Мой хп: {player.current_health}, моя общая броня: {player.additional_armor + player.base_armor}\n")
+
+
+
+
+            print(f"\nHP {enemy.current_health} | ARMOR {enemy.base_armor}")
+            print(f"HP: {player.current_health} | ARMOR {player.base_armor}\n")
             turn += 1
             if turn % 2 == 0:  # Мой ход
                 enemy_solution = random.randint(1, 3)
@@ -222,20 +237,19 @@ class Battle:
                         return player_condition
 
                 if player_solution == BattleAction.BLOCK:
-                    player.additional_armor += 5  # TODO: Добавить фукнцию для брони
+                    player.base_armor += 5  # TODO: Добавить фукнцию для брони
+                    player_armor_status = True
 
                 if player_solution == BattleAction.ESTUS:
-                    difference_in_health = player.max_health - player.current_health
-                    if difference_in_health >= 10 and player.estus > 0:
-                        player.current_health += 10
-                        player.estus -= 1
-                    elif difference_in_health < 10 and player.estus > 0:
-                        player.current_health += difference_in_health
-                        player.estus -= 1
+                    player.regeneration_health(10)
 
                 if player_solution == BattleAction.ABILITY:
                     pass
                     # TODO: добавить действия связанные с механикой героя
+
+                if enemy_armor_status:
+                    enemy.base_armor -= 5
+                    enemy_armor_status = False
 
 
             elif turn % 2 != 0:  # Ход врага
@@ -254,11 +268,16 @@ class Battle:
                         return player_condition
 
                 if enemy_solution == BattleAction.BLOCK:
-                    enemy.additional_armor += 5
+                    enemy.base_armor += 5
+                    enemy_armor_status = True
 
                 if enemy_solution == BattleAction.ABILITY:
                     pass
                     # TODO: добавить действия связанные с механикой героя
+
+                if player_armor_status:
+                    player.base_armor -= 5
+                    player_armor_status = False
 
 me = Player()
 enemy = Demon()
