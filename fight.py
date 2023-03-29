@@ -1,29 +1,47 @@
 import random
 from typing import List
 from enum import Enum
-
+from items import Item, Weapon, Armor, Healing_Potion, Potion, Damage_Potion
 # from console import Console
 class Unit:
     def __init__(self) -> None:
         self.max_health = 100
         self.current_health = self.max_health
-        self.base_attack = 0
-        self.real_attack = 10
+
+        self.base_attack = 10
+        self.real_attack = self.base_attack
+
         self.base_armor = 10
         self.additional_armor = 0
-        # self.agility = 10
-        self.estus = 3  # TODO: ??? 인벤토리로 이동 ???
 
+        # self.agility = 10
+
+        self.estus = 3  # TODO: ??? 인벤토리로 이동 ???
+        self.weapon = None
+        self.armor = None
+
+    # Конечная функция, которая наносит урон
     def get_damage(self, attack) -> None:
         self.current_health -= attack * self.get_real_damage()
 
-    def make_damage(self, other) -> None:
-        other.get_damage(self.real_attack)
+    # def get_total_armor(self):
+    #     if self.armor:
+    #         return self.additional_armor + self.base_armor + self.armor.item_armor
+    #     else:
+    #         return self.additional_armor + self.base_armor
 
+    # Функция, которая возвращает множитель, чтобы уменьшить урон, в зависимости от количества брони
     def get_real_damage(self):
-        damage_multiplier = 1 - (0.06 * (self.additional_armor + self.base_armor) + (self.additional_armor + self.base_armor)) / (1 + 0.06 * (self.additional_armor + self.base_armor) + (self.additional_armor + self.base_armor))
+        # full_armor = self.get_total_armor()
+        full_armor = self.base_armor + self.additional_armor
+        damage_multiplier = 1 - ((0.06 * full_armor) / (1 + 0.06 * abs(full_armor)))
         return damage_multiplier
 
+    # def get_real_attack(self):
+    #     if self.weapon:
+    #         return self.base_attack + self.weapon.item_damage
+    #     else:
+    #         return self.base_attack
 
 class Player(Unit):
     def __init__(self) -> None:
@@ -151,19 +169,11 @@ class Seller(Unit):
     pass
     # TODO: Добавить продавца
 
-class BattleAction(Enum):
+class BattleAction:
     ATTACK = 1
     BLOCK = 2
     ABILITY = 3
     ESTUS = 4
-
-
-# class Effect:
-#     def __init__(self, duration, effect, value):
-#         self.duration = duration
-#         self.name = effect
-#         self.value = value
-
 
 
 class Battle:
@@ -179,13 +189,14 @@ class Battle:
         player_condition = True  # True = Life; False - Death
 
         while player.current_health > 0 and enemy.current_health > 0:
-            # enemy.additional_armor -= 5
-            # player.additional_armor -= 5
-            print(f"Хп врага: {enemy.current_health}, общая броня врага: {enemy.additional_armor+enemy.base_armor}")
+            enemy.additional_armor -= 5
+            player.additional_armor -= 5
+            print(f"\nХп врага: {enemy.current_health}, общая броня врага: {enemy.additional_armor + enemy.base_armor}")
             print(f"Мой хп: {player.current_health}, моя общая броня: {player.additional_armor + player.base_armor}\n")
             turn += 1
             if turn % 2 == 0:  # Мой ход
                 enemy_solution = random.randint(1, 3)
+
                 if enemy_solution == BattleAction.ATTACK:
                     print(f"Enemy prepares to attack")
                 elif enemy_solution == BattleAction.BLOCK:
