@@ -150,40 +150,25 @@ class Labyrinth(object):
                     print("\u001b[48;5;136m", end="")
                     print(" ", end="")
                     print("\u001b[48;5;235m", end="")
-                elif self.walls[i][j] == 4 and x // 15 == i // 15 and y // 36 == j // 36:
-                    if i % 15 == 5 and j % 36 == 5:
-                        for k in range(len(chest)):
-                            for n in range(len(chest[k])):
-                                print(chest[k][n])
-                    elif i % 15 == 7 and j % 36 == 6:
-                        for k in range(len(chest)):
-                            for n in range(len(chest[k])):
-                                print(chest[k][n])
+                elif self.walls[i][j] == 5 and x//15==i//15 and y//36==j//36: #определяем, что курсор находится в зоне комнаты с фонтаном и то, что игрок также находится в этой комнате
+                    if 5<i%15<10 and 9<j%36<27:
+                        print("\u001b[36m", end="")
+                        print("*", end="")
                     else:
                         print(" ", end="")
-                elif self.walls[i][j] == 5 and x // 15 == i // 15 and y // 36 == j // 36:
-                    if i % 15 == 6 and j % 36 == 15:
-                        for k in range(len(fountain)):
-                            for n in range(len(fountain[k])):
-                                print(fountain[k][n])
-                    elif i % 15 == 5 and j % 36 == 10:
-                        for k in range(len(fountain)):
-                            for n in range(len(fountain[k])):
-                                print(fountain[k][n])
+                elif self.walls[i][j] == 4 and x//15==i//15 and y//36==j//36:
+                    if 5<i%15<10 and 9<j%36<27:
+                        print("\u001b[33m", end="")
+                        print("[", end="")
                     else:
                         print(" ", end="")
-                elif self.walls[i][j] == 6 and x // 15 == i // 15 and y // 36 == j // 36:
-                    if i % 15 == 6 and j % 36 == 15:
-                        for k in range(len(shop)):
-                            for n in range(len(shop[k])):
-                                print(shop[k][n])
-                    elif i % 15 == 5 and j % 36 == 10:
-                        for k in range(len(shop)):
-                            for n in range(len(shop[k])):
-                                print(shop[k][n])
+                elif self.walls[i][j] == 6 and x//15==i//15 and y//36==j//36:
+                    if 5<i%15<10 and 9<j%36<27:
+                        print("\u001b[32m", end="")
+                        print("$", end="")
+                        #print("\u001b[0m", end="")
                     else:
                         print(" ", end="")
-
                 else:
                     print(" ", end="")
             print()
