@@ -274,6 +274,10 @@ class Battle:
         player_condition = True  # True = Life; False - Death
         player_armor_status = False
         enemy_armor_status = False
+        print("""ATTACK = 1
+BLOCK = 2
+ABILITY = 3
+ESTUS = 4""")
         while player.current_health > 0 and enemy.current_health > 0:
             print(f"\nHP {enemy.current_health} | ARMOR {enemy.base_armor}")
             print(f"HP: {player.current_health} | ARMOR {player.base_armor}\n")
@@ -289,7 +293,11 @@ class Battle:
                     print(f"Enemy prepares to apply the ability")
 
                 # player_solution = self.console.get_char()
-                player_solution = int(input(f"Твой ход: "))
+                try:
+                    player_solution = int(input(f"Твой ход: "))
+                except:
+                    player_solution = 1
+
                 if player_solution == BattleAction.ATTACK:
                     dice = random.randint(1, 20)
                     if dice == 1:
