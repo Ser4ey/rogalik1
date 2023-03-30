@@ -112,10 +112,18 @@ class DrawLevel:
                 else:
                     draw_symbol_random += s
 
-            self.console.write_object_by_long_string(x_position, y_position, draw_symbol_random)
+            x_position_here = x_position
+            y_position_here = y_position
+            if random.randint(1, 19) > i and 20 > i:
+                x_position_here = x_position + random.randint(-(21-i), 21-i)
+                y_position_here = y_position + random.randint(-(21-i), 21-i)
+
+            self.console.write_object_by_long_string(x_position_here, y_position_here, draw_symbol_random)
             self.console.refresh()
             self.console.napms(random.randint(30, 80))
 
+        self.console.clear_buffer()
+        self.console.get_char()
 
 
 

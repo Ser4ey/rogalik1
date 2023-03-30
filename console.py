@@ -1,5 +1,5 @@
 import curses
-import random
+
 
 class Console:
     def __init__(self, width=150, height=49):
@@ -26,6 +26,12 @@ class Console:
         self.stdscr.keypad(False)
         curses.echo()
         curses.endwin()
+
+    def restart_work(self):
+        curses.curs_set(0)
+        curses.noecho()
+        curses.cbreak()
+        self.stdscr.keypad(True)
 
     def clear(self):
         # Очищает консоль
@@ -109,39 +115,23 @@ class Console:
 
 if __name__ == '__main__':
     console1 = Console()
-    a = [
-    [
-        '-----',
-        '-0-0-',
-        '-----',
-        '-----',
-    ],
-    [
-        '-----',
-        '-X-X-',
-        '-----',
-        '-----',
-    ],
-     ]
 
-    for i in range(2):
-        if i == 0:
-            console1.write_border(1, 1, 9, 8)
-        else:
-            console1.del_border(1, 1, 9, 8)
 
-        console1.write_object_by_list_of_string(3, 3, a[i])
-        console1.get_char()
 
-    console1.clear()
-    console1.write_line(30, 30, 'Вы погибли!')
-    console1.get_char()
+    print(console1.get_char())
+    # console1.clear()
+    # console1.write_line(30, 30, 'Вы погибли!')
+    # console1.get_char()
+    # console1.finish_work()
+    # print('go next')
+    # input('hj:')
+    # console1 = Console()
+    # console1.write_line(30, 30, 'Вы погибли!')
+    # # console1.refresh()
+    # console1.get_char()
 
-    # while True:
-    #     console1.write_line(5, i, '@'*4*(i+1))
-    #
-    #     s = console1.get_char()
-    #     i+=1
+
+
 
 
 

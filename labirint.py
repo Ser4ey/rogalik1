@@ -3,13 +3,20 @@ from random import choice
 import time
 import os
 import keyboard
+
+
 def clear_console():
     os.system('cls' if os.name=='nt' else 'clear')
+
+
 keyboard.block_key('w')
 keyboard.block_key('a')
 keyboard.block_key('s')
 keyboard.block_key('d')
-keyboard.block_key('q')#типы клеток:
+keyboard.block_key('q')
+keyboard.block_key('e')
+
+#типы клеток:
 #0 - нет комнаты
 #1 - вход
 #2 - выход
@@ -36,6 +43,7 @@ class Labyrinth(object):
     rooms_place = [[0, 0, 0, 0], [0, 0,0,0], [0, 0,0,0], [0,0, 0, 0]]
     walls = [[0 for j in range(144)] for i in range(60)]
     rooms = [[None for j in range(4)] for i in range(4)]
+
     def generate(self):
         self.rooms_place = [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         self.walls = [[0 for j in range(144)] for i in range(60)]
@@ -181,34 +189,52 @@ class Labyrinth(object):
             print()
 
         if(keyboard.is_pressed('q')):
+            current_room_number = self.rooms[x//15][y//36].idRoom
+            room_type = ''
+
             print("Уровень: ", count)
             print("_____________________________")
             print("Комната " , "№" ,self.rooms[x//15][y//36].idRoom, end="")
             if self.rooms[x//15][y//36].typeRoom == 1:
+                room_type = 'вход'
                 print(", вход.")
             elif self.rooms[x//15][y//36].typeRoom == 2:
+                room_type = 'выход'
                 print(", выход.")
             elif self.rooms[x//15][y//36].typeRoom == 3:
+                room_type = 'с монстром'
                 print(" с монстром", end="")
             elif self.rooms[x//15][y//36].typeRoom == 4:
+                room_type = 'с сундуком'
                 print(" с сундуком", end="")
             elif self.rooms[x//15][y//36].typeRoom == 5:
+                room_type = 'с фонтаном'
                 print(" с фонтаном", end="")
             elif self.rooms[x//15][y//36].typeRoom == 6:
+                room_type = 'с торговцем'
                 print(" с торговцем", end="")
             elif self.rooms[x//15][y//36].typeRoom == 7:
+                room_type = 'коридор'
                 print(", коридор.")
+
+            print('')
+            used = 0
             if (2 < self.rooms[x//15][y//36].typeRoom < 7):
                 if self.rooms[x // 15][y // 36].check == 0:
-                    print(", взаимодействия не было.")
+                    # print(", взаимодействия не было.")
+                    used = 0
                 else:
-                    print(", взаимодействие было.")
-            print("_____________________________")
-            print("HP: ", )
-            print("_____________________________")
+                    # print(", взаимодействие было.")
+                    used = 1
+            # print("_____________________________")
+            # print("HP: ", )
+            # print("_____________________________")
             # keyboard.on_release_key('a', self.rooms[x // 15][y // 36].check = 1)
             self.rooms[x // 15][y // 36].check = 1
-            time.sleep(3)
+            return current_room_number, room_type, used
+            # time.sleep(3)
+
+        return -1, -1, -1
 
 
 def move(level, i, j):
@@ -238,26 +264,29 @@ def move(level, i, j):
             j += 1
     return level,i,j
 
-level = Labyrinth()
-count=1
-while not keyboard.is_pressed('esc'):
-    i = 2
-    j = 2
-    level.generate()
-    while not (keyboard.is_pressed('RETURN') and level.rooms_place[i // 15][j // 36] == 2):
-        time.sleep(0.001)
-        level, i, j = move(level, i, j)
-        level.draw(i, j, count)
-        if (level.rooms[i//15][j//36].typeRoom==3) and (level.rooms[i//15][j//36].check == 0):
-            print("БОЙ НАЧАЛСЯ!")
-            time.sleep(2)
-            level.rooms[i // 15][j // 36].check = 1
-        if (level.rooms[i//15][j//36].typeRoom==4) and (level.rooms[i//15][j//36].check==0):
-            print("Воспользуйтесь сундуком, чтобы получить предметы")
-        if (level.rooms[i//15][j//36].typeRoom==5) and (level.rooms[i//15][j//36].check==0):
-            print("Воспользуйтесь фонтаном, чтобы пополнить здоровье")
-        if (level.rooms[i//15][j//36].typeRoom==6) and (level.rooms[i//15][j//36].check==0):
-            print("Воспользуйтесь торговцем, чтобы приобрести предметы")
-    count += 1
+
+if __name__ == '__main__':
+    level = Labyrinth()
+    count=1
+    while not keyboard.is_pressed('esc'):
+        i = 2
+        j = 2
+        level.generate()
+        while not (keyboard.is_pressed('RETURN') and level.rooms_place[i // 15][j // 36] == 2):
+            time.sleep(0.001)
+            level, i, j = move(level, i, j)
+            level.draw(i, j, count)
+            print(f'Текущий уровень: {count}')
+            if (level.rooms[i//15][j//36].typeRoom==3) and (level.rooms[i//15][j//36].check == 0):
+                print("БОЙ НАЧАЛСЯ!")
+                time.sleep(2)
+                level.rooms[i // 15][j // 36].check = 1
+            if (level.rooms[i//15][j//36].typeRoom==4) and (level.rooms[i//15][j//36].check==0):
+                print("Воспользуйтесь сундуком, чтобы получить предметы")
+            if (level.rooms[i//15][j//36].typeRoom==5) and (level.rooms[i//15][j//36].check==0):
+                print("Воспользуйтесь фонтаном, чтобы пополнить здоровье")
+            if (level.rooms[i//15][j//36].typeRoom==6) and (level.rooms[i//15][j//36].check==0):
+                print("Воспользуйтесь торговцем, чтобы приобрести предметы")
+        count += 1
 
 

@@ -1,36 +1,37 @@
 class Item:
-    def __init__(self, name, description):
+    def __init__(self, name, description, price):
         self.name = name
         self.description = description
+        self.price = price
 
 class Armor(Item):
     def __init__(self, name, description, item_armor, price):
-        super().__init__(name, description)
+        super().__init__(name, description, price)
         self.item_armor = item_armor
-        self.price = price
+        # self.price = price
 
 class Weapon(Item):
     def __init__(self, name, description, item_damage, price):
-        super().__init__(name, description)
+        super().__init__(name, description, price)
         self.item_damage = item_damage
-        self.price = price
+        # self.price = price
 
 class Potion(Item):
     def __init__(self, name, description, duration, price):
-        super().__init__(name, description)
+        super().__init__(name, description, price)
         self.duration = duration
-        self.price = price
+        # self.price = price
 
 class Healing_Potion(Potion):
     def __init__(self, name, description, duration, price):
-        super().__init__(name, description, duration)
-        self.price = price
+        super().__init__(name, description, duration, price)
+        # self.price = price
 
 
 class Damage_Potion(Potion):
     def __init__(self, name, description, duration, price):
-        super().__init__(name, description, duration)
-        self.price = price
+        super().__init__(name, description, duration, price)
+        # self.price = price
 
 
 

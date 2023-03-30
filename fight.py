@@ -1,8 +1,10 @@
 import random
 from typing import List
 from enum import Enum
-from items import Item, Weapon, Armor, Healing_Potion, Potion, Damage_Potion
-# from console import Console
+from items import *
+from console import Console
+
+
 class Unit:
     def __init__(self) -> None:
         self.max_health = 100
@@ -43,15 +45,21 @@ class Unit:
             return self.base_armor
 
 
-
 class Player(Unit):
-    def __init__(self) -> None:
+    def __init__(self, console: Console) -> None:
         super().__init__()
         self.level = 1
         self.money = 0
         self.exp_for_level = 10
         self.current_exp = 0
+
+        self.armor_by_item = 0
+        self.attack_by_item = 0
+
         # self.effects: List[Effect] = []
+        self.inventory = Inventory(console, self)
+
+
     def level_up(self, experience) -> None:
         self.current_exp += experience
         if self.current_exp >= self.exp_for_level:
@@ -64,9 +72,21 @@ class Player(Unit):
         self.current_armor = new_armor
         self.real_armor = self.base_armor + new_armor.item_armor
 
+    def unequip_armor(self):
+        if self.current_armor is None:
+            return
+        self.real_armor -= self.current_armor.item_armor
+        self.current_armor = None
+
     def equip_weapon(self, new_weapon: Weapon):
         self.current_weapon = new_weapon
         self.real_attack = self.base_attack + new_weapon.item_damage
+
+    def unequip_weapon(self):
+        if self.current_weapon is None:
+            return
+        self.real_attack -= self.current_weapon.item_damage
+        self.current_weapon = None
 
     def regeneration_health(self, regeneration_value):
         difference_in_health = self.max_health - self.current_health
@@ -76,6 +96,58 @@ class Player(Unit):
         elif difference_in_health < regeneration_value and self.estus > 0:
             self.current_health += difference_in_health
             self.estus -= 1
+
+
+class Inventory:
+    def __init__(self, console: Console, player: Player):
+        self.items = []
+        self.console = console
+        self.player = player
+
+    def add_item(self, item: Item):
+        self.items.append(item)
+
+    def del_item_by_index(self, index: int):
+        try:
+            self.items.pop(index)
+            return True
+        except:
+            return False
+
+    def draw_items(self, current_item: int):
+        start_x = 3
+        start_y = 8
+        if len(self.items) == 0:
+            self.console.write_line(start_x, start_y, f'У вас ничего нет!')
+            return
+
+        for i in range(len(self.items)):
+            item_type = start_x, start_y, type(self.items[i]).__name__
+
+            if current_item == i:
+                line_to_write = f'[*] '
+            else:
+                line_to_write = f'[ ] '
+
+            line_to_write += f'Название предмета: {self.items[i]} Тип предмета: {item_type} '
+            if self.items[i] == self.player.current_armor or self.items[i] == self.player.current_weapon:
+                line_to_write += '(экипировано)'
+            start_y += 2
+
+    def show_inventory(self):
+        self.console.clear()
+        self.console.write_border(0, 0, 150, 49)
+        self.console.write_line(3, 2, f'Текущий уровень: {self.player.level}')
+        self.console.write_line(3, 3, f'Опыта: {self.player.current_exp}/{self.player.exp_for_level}')
+        self.console.write_line(3, 4, f'Баланс: {self.player.money}')
+        self.console.write_line(3, 5, f'Здроье: {self.player.current_health}/{self.player.max_health}')
+
+        self.console.write_line(3, 7, 'Инвентарь:')
+
+        self.draw_items(0)
+        char = self.console.get_char()
+
+
 class Enemy(Unit):
     money_after_death = 10
     def __init__(self) -> None:
@@ -113,6 +185,7 @@ class Knight(Enemy):
 |     \  \  \   \                  /   /  /  /     |
 |      \  \  \   \                /   /  /  /      |
 '''
+
 
 class Skeleton(Enemy):
     def __init__(self) -> None:
@@ -202,10 +275,6 @@ class Battle:
         player_armor_status = False
         enemy_armor_status = False
         while player.current_health > 0 and enemy.current_health > 0:
-
-
-
-
             print(f"\nHP {enemy.current_health} | ARMOR {enemy.base_armor}")
             print(f"HP: {player.current_health} | ARMOR {player.base_armor}\n")
             turn += 1
@@ -279,6 +348,12 @@ class Battle:
                     player.base_armor -= 5
                     player_armor_status = False
 
-me = Player()
-enemy = Demon()
-Battle = Battle.fight(me, enemy)
+
+if __name__ == '__main__':
+    me = Player(Console())
+
+    me.inventory.show_inventory()
+    for i in range(10):
+        enemy = Demon()
+        b = Battle.fight(me, enemy)
+        print(f'Результат: {b}')
